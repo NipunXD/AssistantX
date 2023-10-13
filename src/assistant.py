@@ -13,6 +13,7 @@ import tkinter as tk
 from tkinter import simpledialog, PhotoImage
 from geopy.geocoders import Nominatim
 from dotenv import load_dotenv
+from PIL import Image, ImageTk
 
 load_dotenv()
 
@@ -226,15 +227,20 @@ if __name__ == "__main__":
     label = tk.Label(root, text="AssistantX is ready. How can I assist you?")
     label.pack(pady=10)
 
-    entry = tk.Entry(root, width=50)
+    entry = tk.Entry(root, width=50, font=("Helvetica", 12))
     entry.pack(pady=10)
 
-    submit_button = tk.Button(root, text="Submit", command=on_submit_click)
+    submit_button = tk.Button(root, text="Submit", command=on_submit_click, bg="#4CAF50", fg="white", font=("Helvetica", 12))
     submit_button.pack(pady=10)
 
-    mic_icon = PhotoImage(file=r"C:\Users\Nipun Arora\Downloads\microphone.png")  # Replace with the path to your microphone icon image
-    mic_button = tk.Button(root, image=mic_icon, command=on_mic_click, width=50, height=50)
+    mic_icon_path = r"images\microphone.png"
+    mic_icon = Image.open(mic_icon_path)
+    mic_icon = Image.open(mic_icon_path)
+    mic_icon = mic_icon.resize((30, 30))
+    mic_icon = ImageTk.PhotoImage(mic_icon)
+    mic_button = tk.Button(root, image=mic_icon, command=on_mic_click, bd=0, highlightthickness=0)
     mic_button.image = mic_icon
     mic_button.pack(pady=10)
 
     root.mainloop()
+    
