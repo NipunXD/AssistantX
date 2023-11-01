@@ -13,7 +13,7 @@ END = (MAZE_SIZE - 1, MAZE_SIZE - 1)
 # Create a maze with a known path
 maze = [[0] * MAZE_SIZE for _ in range(MAZE_SIZE)]
 path = [(x, 0) for x in range(MAZE_SIZE)]
-path.extend((MAZE_SIZE - 1, y) for y in range(1, MAZE_SIZE))
+path.extend((MAZE_SIZE , y) for y in range(1, MAZE_SIZE))
 path.extend((x, MAZE_SIZE - 1) for x in range(1, MAZE_SIZE))
 
 # Randomly add walls
