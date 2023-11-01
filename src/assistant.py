@@ -10,6 +10,9 @@ import smtplib
 import os
 import keyboard
 import tkinter as tk
+import tkinter.simpledialog
+import time
+from datetime import datetime
 from tkinter import simpledialog
 from geopy.geocoders import Nominatim
 from dotenv import load_dotenv
@@ -92,30 +95,37 @@ def get_gpt_response(command):
 
 # Function to set a reminder
 def set_reminder():
+    print(datetime.now().time())
     speak("What would you like to be reminded about?")
     reminder_text = get_audio()
 
     if reminder_text:
-        speak("When should I remind you?")
-        reminder_time = get_audio()
+        root = tk.Tk()
+        root.withdraw()  # Hide the main window
 
-        if reminder_time:
+        # Create a simple dialog for picking time
+        time_str = tkinter.simpledialog.askstring("Set Reminder", "When should I remind you? (HH:MM:SS)")
+        root.destroy()  # Close the dialog window
+
+        if time_str:
             try:
-                # Parse the reminder time
-                reminder_datetime = datetime.datetime.strptime(reminder_time, "%H:%M:%S")
-                
-                # Calculate the time difference
-                current_time = datetime.datetime.now()
-                time_difference = (reminder_datetime - current_time).total_seconds()
+                reminder_time = datetime.strptime(time_str, "%H:%M:%S").time()
+                now = datetime.now().time()
+                if reminder_time > now:
+                    # Calculate the time difference
+                    time_difference = datetime.combine(datetime.today(), reminder_time) - datetime.combine(datetime.today(), now)
 
-                # Schedule the reminder
-                if time_difference > 0:
-                    time.sleep(time_difference)
+                    # Schedule the reminder
+                    seconds_until_reminder = time_difference.total_seconds()
+                    time.sleep(seconds_until_reminder)
                     speak(f"Reminder: {reminder_text}")
+                    print(f"Reminder: {reminder_text}") 
                 else:
                     speak("Invalid reminder time. Please provide a future time.")
+                    print("Invalid reminder time. Please provide a future time.")   
             except ValueError:
                 speak("Invalid time format. Please provide the time in HH:MM:SS format.")
+                print("Invalid time format. Please provide the time in HH:MM:SS format.")   
 
 def get_lat_lon(city):
     geolocator = Nominatim(user_agent="your_app_name")
