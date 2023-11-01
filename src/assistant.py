@@ -10,10 +10,15 @@ import smtplib
 import os
 import keyboard
 import tkinter as tk
-from tkinter import simpledialog, PhotoImage
+from tkinter import simpledialog
 from geopy.geocoders import Nominatim
 from dotenv import load_dotenv
 from PIL import Image, ImageTk
+from newsapi import NewsApiClient
+from expense_manager import create_expense_manager
+from maze_solver import create_maze_solver
+from tkinter import messagebox
+from tic_tac_toe import TicTacToe
 
 load_dotenv()
 
@@ -21,7 +26,7 @@ engine = pyttsx3.init('sapi5')
 voices = engine.getProperty('voices')
 engine.setProperty('voice', voices[0].id)
 volume = engine.getProperty('volume')    
-engine.setProperty('volume',50.0)
+engine.setProperty('volume',100.0)
 
 openai.api_key = os.getenv('openai_key')
 gmail_pass = os.getenv('gmail_pass_env')
@@ -144,6 +149,42 @@ def get_weather(city):
              print("Error fetching weather data:", e)
              speak("Sorry, there was an error fetching weather information.")
 
+def get_news_updates():
+    api_key = os.getenv('news_api_key')
+    newsapi = NewsApiClient(api_key=api_key)
+    news_api_url = f"https://newsapi.org/v2/top-headlines?country=us&apiKey={api_key}"
+
+    try:
+        response = newsapi.get_top_headlines()
+        if response is not None:
+            data = response
+
+            if 'articles' in data:
+                articles = data['articles']
+                for idx, article in enumerate(articles[:5]):
+                    title = article['title']
+                    description = article['description']
+                    print(f"News {idx + 1}: {title}. {description}")
+                    speak(f"News {idx + 1}: {title}. {description}")
+            else:
+                print(response)
+                speak("Sorry, I couldn't retrieve news updates.")
+    except Exception as e:
+        print("Error fetching news data:", e)
+        speak("Sorry, there was an error fetching news updates.")
+
+
+def on_expense_manager_click():
+    create_expense_manager() 
+
+def on_maze_solver_click():
+    create_maze_solver()  
+
+def start_tic_tac_toe_game():
+    root = tk.Tk()
+    game = TicTacToe(root)
+    root.mainloop()        
+
 # Function to execute commands
 def execute_command(command):
     if "hello" in command:
@@ -186,6 +227,9 @@ def execute_command(command):
         songs = os.listdir(music_dir)
         os.startfile(os.path.join(music_dir, songs[0]))
 
+    elif "news updates" in command:
+        get_news_updates()    
+
     elif "exit" in command:
         speak("Goodbye!")
         root.destroy() 
@@ -224,7 +268,13 @@ if __name__ == "__main__":
     root = tk.Tk()
     root.title("AssistantX")
 
-    label = tk.Label(root, text="AssistantX is ready. How can I assist you?")
+    main_frame = tk.Frame(root, highlightbackground="black", highlightthickness=1)
+    main_frame.pack(padx=20, pady=20)
+
+    title_label = tk.Label(main_frame, text="AssistantX - Your Personal Assistant", font=("Helvetica", 20))
+    title_label.pack(pady=10)
+
+    label = tk.Label(root, text="AssistantX is ready. How can I assist you?", font=("Helvetica", 14))
     label.pack(pady=10)
 
     entry = tk.Entry(root, width=50, font=("Helvetica", 12))
@@ -242,5 +292,13 @@ if __name__ == "__main__":
     mic_button.image = mic_icon
     mic_button.pack(pady=10)
 
+    expense_manager_button = tk.Button(root, text="Expense Manager", command=on_expense_manager_click)
+    expense_manager_button.pack()
+
+    maze_solver_button = tk.Button(root, text="Maze Solver", command=on_maze_solver_click)
+    maze_solver_button.pack()
+
+    tic_tac_toe_button = tk.Button(root, text="Play Tic Tac Toe", command=start_tic_tac_toe_game)
+    tic_tac_toe_button.pack()
+
     root.mainloop()
-    
