@@ -73,7 +73,7 @@ def create_expense_manager():
                 row += 1
                 for name, amount in expenses[category]:
                     tk.Label(expenses_frame, text=name, font=("Arial", 12)).grid(row=row, column=0)
-                    tk.Label(expenses_frame, text=f"${amount:.2f}", font=("Arial", 12)).grid(row=row, column=1)
+                    tk.Label(expenses_frame, text=f"₹{amount:.2f}", font=("Arial", 12)).grid(row=row, column=1)
                     row += 1
 
     def update_category_totals():
@@ -86,12 +86,12 @@ def create_expense_manager():
         for category in categories:
             total = category_totals.get(category, 0)
             tk.Label(totals_frame, text=f"{category} Total:", font=("Arial", 12)).grid(row=row, column=0)
-            tk.Label(totals_frame, text=f"${total:.2f}", font=("Arial", 12)).grid(row=row, column=1)
+            tk.Label(totals_frame, text=f"₹{total:.2f}", font=("Arial", 12)).grid(row=row, column=1)
             row += 1
 
         complete_total = sum(category_totals.values())
         tk.Label(totals_frame, text="Complete Total:", font=("Arial", 14, "bold")).grid(row=row, column=0)
-        tk.Label(totals_frame, text=f"${complete_total:.2f}", font=("Arial", 14, "bold")).grid(row=row, column=1)
+        tk.Label(totals_frame, text=f"₹{complete_total:.2f}", font=("Arial", 14, "bold")).grid(row=row, column=1)
 
     def delete_expense():
         category = category_var.get()
