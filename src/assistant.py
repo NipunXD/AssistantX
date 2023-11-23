@@ -300,44 +300,46 @@ def on_mic_click():
 if __name__ == "__main__":
     root = tk.Tk()
     root.title("AssistantX")
+    root.configure(bg='#333333')  # Set dark background color
 
-    main_frame = tk.Frame(root, highlightbackground="black", highlightthickness=1)
-    main_frame.pack(padx=20, pady=20)
+    main_frame = tk.Frame(root, padx=20, pady=20, bg='#333333')  # Set dark background color
+    main_frame.pack()
 
-    title_label = tk.Label(main_frame, text="AssistantX - Your Personal Assistant", font=("Helvetica", 20))
+    title_label = tk.Label(main_frame, text="AssistantX - Your Personal Assistant", font=("Helvetica", 20), bg='#333333', fg='white')  # Set text color to white
     title_label.pack(pady=10)
 
-    label = tk.Label(root, text="AssistantX is ready. How can I assist you?", font=("Helvetica", 14))
+    label = tk.Label(root, text="AssistantX is ready. How can I assist you?", font=("Helvetica", 14), bg='#333333', fg='white')  # Set text color to white
     label.pack(pady=10)
 
     entry = tk.Entry(root, width=50, font=("Helvetica", 12))
     entry.pack(pady=10)
 
-    submit_button = tk.Button(root, text="Submit", command=on_submit_click, bg="#4CAF50", fg="white",font=("Helvetica", 12))
+    submit_button = tk.Button(root, text="Submit", command=on_submit_click, bg="#4CAF50", fg="white", font=("Helvetica", 12))
     submit_button.pack(pady=10)
 
+    # Stylish microphone button
     mic_icon_path = r"src\images\microphone.png"
-    mic_icon = Image.open(mic_icon_path)
     mic_icon = Image.open(mic_icon_path)
     mic_icon = mic_icon.resize((30, 30))
     mic_icon = ImageTk.PhotoImage(mic_icon)
-    mic_button = tk.Button(root, image=mic_icon, command=on_mic_click, bd=0, highlightthickness=0)
+    mic_button = tk.Button(root, image=mic_icon, command=on_mic_click, bd=0, highlightthickness=0, bg='#333333')  # Set dark background color
     mic_button.image = mic_icon
     mic_button.pack(pady=10)
 
-    expense_manager_button = tk.Button(root, text="Expense Manager", command=on_expense_manager_click)
-    expense_manager_button.pack()
+    # Stylish action buttons
+    buttons_frame = tk.Frame(root, bg='#333333')  # Set dark background color
+    buttons_frame.pack(pady=10)
 
-    maze_solver_button = tk.Button(root, text="Maze Solver", command=on_maze_solver_click)
-    maze_solver_button.pack()
+    action_buttons = [
+        ("Expense Manager", on_expense_manager_click),
+        ("Maze Solver", on_maze_solver_click),
+        ("Play Tic Tac Toe", start_tic_tac_toe_game),
+        ("Open Note Taker", on_note_taker_click),
+        ("Manage Custom Commands", on_custom_command_click)
+    ]
 
-    tic_tac_toe_button = tk.Button(root, text="Play Tic Tac Toe", command=start_tic_tac_toe_game)
-    tic_tac_toe_button.pack()
-
-    note_taker_button = tk.Button(root, text="Open Note Taker", command=on_note_taker_click)
-    note_taker_button.pack()
-
-    custom_command_button = tk.Button(root, text="Manage Custom Commands", command=on_custom_command_click)
-    custom_command_button.pack()
+    for text, command in action_buttons:
+        action_button = tk.Button(buttons_frame, text=text, command=command, font=("Helvetica", 12), bg='#4CAF50', fg='white')  # Set dark background color and white text
+        action_button.pack(side=tk.LEFT, padx=10)
 
     root.mainloop()

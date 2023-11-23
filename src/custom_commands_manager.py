@@ -5,15 +5,14 @@ import os
 
 class CustomCommandsManager:
     def __init__(self):
-        self.root = tk.Toplevel()
+        self.root = tk.Tk()
         self.root.title("Custom Commands")
 
         # Load existing command-program associations from commands.json
         self.command_program_dict = self.load_command_program_dict()
 
         # Create a listbox to display custom commands
-        self.custom_commands_listbox = tk.Listbox(self.root, selectmode=tk.SINGLE, height=10, width=50,
-                                                  font=("Arial", 12))
+        self.custom_commands_listbox = tk.Listbox(self.root, selectmode=tk.SINGLE, height=10, width=50, font=("Arial", 12))
         self.custom_commands_listbox.pack(padx=10, pady=10, expand=True, fill=tk.BOTH)
 
         # Populate the listbox with existing custom commands
@@ -21,13 +20,13 @@ class CustomCommandsManager:
 
         # Buttons for adding, deleting, and closing
         add_custom_button = tk.Button(self.root, text="Add Custom Command", command=self.add_custom_command)
-        add_custom_button.pack(pady=5)
+        add_custom_button.pack(pady=5, ipadx=10)
 
         delete_custom_button = tk.Button(self.root, text="Delete Custom Command", command=self.delete_custom_command)
-        delete_custom_button.pack(pady=5)
+        delete_custom_button.pack(pady=5, ipadx=10)
 
         close_button = tk.Button(self.root, text="Close", command=self.root.destroy)
-        close_button.pack(pady=5)
+        close_button.pack(pady=5, ipadx=10)
 
     def load_command_program_dict(self):
         # Load command-program associations from commands.json

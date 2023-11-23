@@ -12,6 +12,7 @@ class NoteTaker:
     def __init__(self, root):
         self.root = root
         self.root.title("Note Taker")
+
         # Initialize the GUI components
         self.init_gui()
 
@@ -26,37 +27,43 @@ class NoteTaker:
                   foreground=[('pressed', 'white'), ('active', 'black')],
                   background=[('pressed', '!disabled', 'black'), ('active', '#55acee')])
 
+        # Add labels for better organization
+        tk.Label(self.root, text="Enter Note:", font=("Arial", 12, "bold")).grid(row=0, column=0, padx=10, pady=5, sticky="w")
+
         # Textbox to enter note
         self.note_entry = tk.Text(self.root, width=40, height=5, font=("Arial", 12))
-        self.note_entry.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
+        self.note_entry.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
 
         # Buttons
         add_button = ttk.Button(self.root, text="Add Note", command=self.add_note)
-        add_button.grid(row=0, column=1, padx=5, pady=10, sticky="ew")
+        add_button.grid(row=2, column=0, padx=5, pady=10, sticky="ew")
 
         attach_button = ttk.Button(self.root, text="Attach File", command=self.attach_file)
-        attach_button.grid(row=0, column=4, padx=5, pady=10, sticky="ew")
+        attach_button.grid(row=2, column=1, padx=5, pady=10, sticky="ew")
 
         view_button = ttk.Button(self.root, text="View Notes", command=self.view_notes)
-        view_button.grid(row=0, column=2, padx=5, pady=10, sticky="ew")
+        view_button.grid(row=2, column=2, padx=5, pady=10, sticky="ew")
 
         delete_button = ttk.Button(self.root, text="Delete Note", command=self.delete_note)
-        delete_button.grid(row=0, column=3, padx=5, pady=10, sticky="ew")
+        delete_button.grid(row=2, column=3, padx=5, pady=10, sticky="ew")
 
         # Additional variables to store attached file paths and names
         self.attached_files = {}
 
+        # Label for notes listbox
+        tk.Label(self.root, text="Notes:", font=("Arial", 12, "bold")).grid(row=3, column=0, padx=10, pady=5, sticky="w")
+
         # Listbox to display notes
         self.notes_listbox = tk.Listbox(self.root, selectmode=tk.SINGLE, height=10, width=50, font=("Arial", 12))
-        self.notes_listbox.grid(row=1, column=0, columnspan=4, padx=10, pady=10, sticky="nsew")
+        self.notes_listbox.grid(row=4, column=0, columnspan=4, padx=10, pady=10, sticky="nsew")
 
         # Scrollbar for the listbox
         scrollbar = ttk.Scrollbar(self.root, orient=tk.VERTICAL, command=self.notes_listbox.yview)
-        scrollbar.grid(row=1, column=4, sticky="ns")
+        scrollbar.grid(row=4, column=4, sticky="ns")
         self.notes_listbox.config(yscrollcommand=scrollbar.set)
 
         # Configure row and column weights
-        self.root.grid_rowconfigure(1, weight=1)
+        self.root.grid_rowconfigure(4, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
         self.root.grid_columnconfigure(1, weight=1)
         self.root.grid_columnconfigure(2, weight=1)
@@ -123,7 +130,6 @@ class NoteTaker:
 
                 # Open the file using the default application
                 os.system(f'start {temp_file_path}')
-
 
     def delete_note(self):
         notes_data = self.load_notes()
