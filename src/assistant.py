@@ -9,10 +9,8 @@ import speech_recognition as sr
 import smtplib
 import os
 import keyboard
+import subprocess
 import tkinter as tk
-import tkinter.simpledialog
-import time
-from datetime import datetime
 from tkinter import simpledialog
 from geopy.geocoders import Nominatim
 from dotenv import load_dotenv
@@ -20,16 +18,17 @@ from PIL import Image, ImageTk
 from newsapi import NewsApiClient
 from expense_manager import create_expense_manager
 from maze_solver import create_maze_solver
-from tkinter import messagebox
 from tic_tac_toe import TicTacToe
+from note_taker import create_note_taker
+from custom_commands_manager import CustomCommandsManager
 
 load_dotenv()
 
 engine = pyttsx3.init('sapi5')
 voices = engine.getProperty('voices')
 engine.setProperty('voice', voices[0].id)
-volume = engine.getProperty('volume')    
-engine.setProperty('volume',100.0)
+volume = engine.getProperty('volume')
+engine.setProperty('volume', 100.0)
 
 openai.api_key = os.getenv('openai_key')
 gmail_pass = os.getenv('gmail_pass_env')
@@ -37,19 +36,18 @@ gmail_id = os.getenv('gmail_id_env')
 
 # Function to speak text
 def _speak(text):
-        
-        engine.say(text)
-        engine.runAndWait()
+    engine.say(text)
+    engine.runAndWait()
 
-def speak(text):       
-        p = multiprocessing.Process(target=_speak, args=(text,))
-        p.start()
-        while p.is_alive():
-            if keyboard.is_pressed('esc'):
-                p.terminate()
-            else:
-                continue
-        p.join()
+def speak(text):
+    p = multiprocessing.Process(target=_speak, args=(text,))
+    p.start()
+    while p.is_alive():
+        if keyboard.is_pressed('esc'):
+            p.terminate()
+        else:
+            continue
+    p.join()
 
 # Function to get user input through speech
 def get_audio():
@@ -86,12 +84,12 @@ def send_email(receiver, subject, body):
 # Function to get GPT response
 def get_gpt_response(command):
     response = openai.Completion.create(
-        engine="text-davinci-002", 
+        engine="text-davinci-002",
         prompt=command,
         max_tokens=50
     )
 
-    return response.choices[0].text.strip()    
+    return response.choices[0].text.strip()
 
 # Function to set a reminder
 def set_reminder():
@@ -104,7 +102,7 @@ def set_reminder():
         root.withdraw()  # Hide the main window
 
         # Create a simple dialog for picking time
-        time_str = tkinter.simpledialog.askstring("Set Reminder", "When should I remind you? (HH:MM:SS)")
+        time_str = simpledialog.askstring("Set Reminder", "When should I remind you? (HH:MM:SS)")
         root.destroy()  # Close the dialog window
 
         if time_str:
@@ -113,19 +111,20 @@ def set_reminder():
                 now = datetime.now().time()
                 if reminder_time > now:
                     # Calculate the time difference
-                    time_difference = datetime.combine(datetime.today(), reminder_time) - datetime.combine(datetime.today(), now)
+                    time_difference = datetime.combine(datetime.today(), reminder_time) - datetime.combine(
+                        datetime.today(), now)
 
                     # Schedule the reminder
                     seconds_until_reminder = time_difference.total_seconds()
                     time.sleep(seconds_until_reminder)
                     speak(f"Reminder: {reminder_text}")
-                    print(f"Reminder: {reminder_text}") 
+                    print(f"Reminder: {reminder_text}")
                 else:
                     speak("Invalid reminder time. Please provide a future time.")
-                    print("Invalid reminder time. Please provide a future time.")   
+                    print("Invalid reminder time. Please provide a future time.")
             except ValueError:
                 speak("Invalid time format. Please provide the time in HH:MM:SS format.")
-                print("Invalid time format. Please provide the time in HH:MM:SS format.")   
+                print("Invalid time format. Please provide the time in HH:MM:SS format.")
 
 def get_lat_lon(city):
     geolocator = Nominatim(user_agent="your_app_name")
@@ -134,7 +133,7 @@ def get_lat_lon(city):
     if location:
         return location.latitude, location.longitude
     else:
-        return None, None                
+        return None, None
 
 # Function to get weather information
 def get_weather(city):
@@ -149,16 +148,19 @@ def get_weather(city):
             data = response.json()
 
             if response.status_code == 200:
-                temperature = round((data["main"]["temp"])-273.15, 2)
+                temperature = round((data["main"]["temp"]) - 273.15, 2)
                 weather_description = data["weather"][0]["description"]
                 print(temperature, weather_description)
-                speak(f"The current temperature in {city} is {temperature} Celsius, and the weather is {weather_description}.")
+                speak(
+                    f"The current temperature in {city} is {temperature} Celsius, and the weather is {weather_description}.")
             else:
                 speak("Sorry, I couldn't retrieve weather information for that city.")
         except Exception as e:
-             print("Error fetching weather data:", e)
-             speak("Sorry, there was an error fetching weather information.")
+            print("Error fetching weather data:", e)
+            speak("Sorry, there was an error fetching weather information.")
 
+
+# function to get news updates
 def get_news_updates():
     api_key = os.getenv('news_api_key')
     newsapi = NewsApiClient(api_key=api_key)
@@ -183,17 +185,26 @@ def get_news_updates():
         print("Error fetching news data:", e)
         speak("Sorry, there was an error fetching news updates.")
 
-
 def on_expense_manager_click():
-    create_expense_manager() 
+    create_expense_manager()
 
 def on_maze_solver_click():
-    create_maze_solver()  
+    create_maze_solver()
+
+# Function to open Note Taker
+def on_note_taker_click():
+    create_note_taker() 
+
+# Function to handle custom command button click
+def on_custom_command_click():
+    custom_commands_manager = CustomCommandsManager()
+    # Run the manager and fetch the updated command_program_dict
+    custom_commands_manager.get_command_program_dict()
 
 def start_tic_tac_toe_game():
     root = tk.Tk()
     game = TicTacToe(root)
-    root.mainloop()        
+    root.mainloop()
 
 # Function to execute commands
 def execute_command(command):
@@ -232,33 +243,43 @@ def execute_command(command):
     elif "set a reminder" in command:
         set_reminder()
 
+    elif "note" in command:
+        create_note_taker()
+
     elif "play music" in command:
         music_dir = "C:\\Users\\YourUsername\\Music"
         songs = os.listdir(music_dir)
         os.startfile(os.path.join(music_dir, songs[0]))
 
     elif "news updates" in command:
-        get_news_updates()    
+        get_news_updates()
 
     elif "exit" in command:
         speak("Goodbye!")
-        root.destroy() 
+        root.destroy()
         exit()
-
     else:
-        try:
-            speak(f"Do you want information about {command}?")
-            response = get_audio()
+        # Check if it's a custom command
+        command_program_dict = CustomCommandsManager().command_program_dict
+        if command in command_program_dict:
+            program = command_program_dict[command]
+            subprocess.Popen([program], shell=True)
 
-            if response and "yes" in response:
-                gpt_response = get_gpt_response(command)
-                print(gpt_response)
-                speak(gpt_response)
-            else:
-                speak("Alright, let me know if there's anything else I can help you with.")
-        except Exception as e:
-            print("Error:", e)
-            speak("Sorry, there was an error processing your request.")
+        else:
+            try:
+                speak(f"Do you want information about {command}?")
+                response = get_audio()
+
+                if response and "yes" in response:
+                    gpt_response = get_gpt_response(command)
+                    print(gpt_response)
+                    speak(gpt_response)
+                else:
+                    speak("Alright, let me know if there's anything else I can help you with.")
+            except Exception as e:
+                print("Error:", e)
+                speak("Sorry, there was an error processing your request.")
+
 
 # Function to handle button click
 def on_submit_click():
@@ -266,12 +287,14 @@ def on_submit_click():
     entry.delete(0, tk.END)  # Clear the entry field
     execute_command(user_input)
 
+
 # Function to handle microphone button click
 def on_mic_click():
     user_input = get_audio()
     if user_input:
         entry.insert(tk.END, user_input)
     execute_command(user_input)
+
 
 # Main loop
 if __name__ == "__main__":
@@ -290,10 +313,10 @@ if __name__ == "__main__":
     entry = tk.Entry(root, width=50, font=("Helvetica", 12))
     entry.pack(pady=10)
 
-    submit_button = tk.Button(root, text="Submit", command=on_submit_click, bg="#4CAF50", fg="white", font=("Helvetica", 12))
+    submit_button = tk.Button(root, text="Submit", command=on_submit_click, bg="#4CAF50", fg="white",font=("Helvetica", 12))
     submit_button.pack(pady=10)
 
-    mic_icon_path = r"images\microphone.png"
+    mic_icon_path = r"src\images\microphone.png"
     mic_icon = Image.open(mic_icon_path)
     mic_icon = Image.open(mic_icon_path)
     mic_icon = mic_icon.resize((30, 30))
@@ -310,5 +333,11 @@ if __name__ == "__main__":
 
     tic_tac_toe_button = tk.Button(root, text="Play Tic Tac Toe", command=start_tic_tac_toe_game)
     tic_tac_toe_button.pack()
+
+    note_taker_button = tk.Button(root, text="Open Note Taker", command=on_note_taker_click)
+    note_taker_button.pack()
+
+    custom_command_button = tk.Button(root, text="Manage Custom Commands", command=on_custom_command_click)
+    custom_command_button.pack()
 
     root.mainloop()
